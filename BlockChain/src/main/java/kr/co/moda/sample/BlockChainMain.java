@@ -6,14 +6,14 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class ModaChain {
+public class BlockChainMain {
 
 	public static List<Block> blockChain = new ArrayList<Block>();
 	public static int difficulty = 5;
 
 	public static void main(String[] args) throws JsonProcessingException {
 
-		ModaChain sample = new ModaChain();
+		BlockChainMain sample = new BlockChainMain();
 
 		// sample.printHashBlock();
 
