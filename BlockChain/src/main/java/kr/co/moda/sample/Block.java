@@ -29,9 +29,9 @@ public class Block {
 		while (!hash.substring(0, difficulty).equals(target)) {
 			nonce++;
 
-			// 디지털 서명
 			hash = calculateHash();
 		}
+
 		System.out.println("Block Mined!!! : " + hash);
 	}
 

@@ -4,6 +4,7 @@ import java.security.MessageDigest;
 
 public class StringUtil {
 
+	// 업계 표준 암호화
 	public static String applySha256(String input) {
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
