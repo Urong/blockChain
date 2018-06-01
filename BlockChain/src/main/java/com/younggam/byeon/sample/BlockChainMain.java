@@ -1,4 +1,4 @@
-package kr.co.moda.sample;
+package com.younggam.byeon.sample;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +15,11 @@ public class BlockChainMain {
 
 		BlockChainMain sample = new BlockChainMain();
 
-		sample.printHash();
+		// sample.printHash();
 
 		// sample.printBlocktoJson();
 
-		// sample.printMineBlockAndValid();
+		sample.printMineBlockAndValid();
 
 	}
 
@@ -80,15 +80,18 @@ public class BlockChainMain {
 				System.out.println("Current Hashes not equal");
 				return false;
 			}
+
 			if (!previousBlock.hash.equals(currentBlock.previousHash)) {
 				System.out.println("Previous Hashes not equal");
 				return false;
 			}
+
 			if (!currentBlock.hash.substring(0, difficulty).equals(hashTarget)) {
 				System.out.println("This block hasn't been mined");
 				return false;
 			}
 		}
+
 		return true;
 	}
 

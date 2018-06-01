@@ -1,4 +1,4 @@
-package kr.co.moda.controller;
+package com.younggam.byeon.controller;
 
 import java.text.DateFormat;
 import java.util.Date;
