@@ -14,7 +14,7 @@ public class Block {
 	public String data;
 	public long timeStamp;
 
-	// 암호 시스템에서 사용하는 일회용 일련번호
+	// 암호 시스템에서 사용하는 일회용 일련번호, 한번 뿐인
 	public int nonce;
 
 	public Block(String data, String previousHash) {
@@ -34,7 +34,7 @@ public class Block {
 		String target = new String(new char[difficulty]).replace('\0', '0');
 		while (!hash.substring(0, difficulty).equals(target)) {
 			// 1비트씩 변질시켜가면서 Hash값을 구해보는것이다.
-			// 그렇게 계속 변질시켜보고 Hash값구하고를 반복하다보면 언젠가 앞쪽에 0이 쌓여있는 Hash값이 발견될테고 그럼 채굴에 성공하는 것이다!
+			// 그렇게 계속 변질시켜보고 Hash값구하고를 반복하다보면 언젠가 앞쪽에 0이 쌓여있는 Hash값이 발견될테고 그럼 채굴에 성공하는 것이다.
 			nonce++;
 
 			hash = calculateHash();

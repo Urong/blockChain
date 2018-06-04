@@ -15,11 +15,11 @@ public class BlockChainMain {
 
 		BlockChainMain sample = new BlockChainMain();
 
-		// sample.printHash();
+		sample.printHash();
 
 		// sample.printBlocktoJson();
 
-		sample.printMineBlockAndValid();
+		// sample.printMineBlockAndValid();
 
 	}
 
