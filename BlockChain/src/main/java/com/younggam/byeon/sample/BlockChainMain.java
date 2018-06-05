@@ -6,6 +6,10 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * 0의 개수가 하나씩 늘어날 때마다 확률적으로 16배씩 더 많은 nonce 숫자를 대입해 보아야 한다.
+ * 
+ */
 public class BlockChainMain {
 
 	public static List<Block> blockChain = new ArrayList<Block>();
@@ -15,12 +19,11 @@ public class BlockChainMain {
 
 		BlockChainMain sample = new BlockChainMain();
 
-		// sample.printHash();
+		sample.printHash();
 
 		// sample.printBlocktoJson();
 
 		sample.printMineBlockAndValid();
-
 	}
 
 	public void printHash() {
