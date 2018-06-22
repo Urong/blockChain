@@ -7,6 +7,7 @@ import java.util.Date;
  * 안전해진다.
  * 
  * 1비트씩 변질 => 앞쪽에 0이 쌓여있는 Hash값이 발견 => 채굴 성공
+ * 
  */
 public class Block {
 
