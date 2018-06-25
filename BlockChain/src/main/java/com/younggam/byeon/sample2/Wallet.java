@@ -60,10 +60,10 @@ public class Wallet {
 			// 아직 사용하기 전 잔액
 			TransactionOutput mianUTXO = item.getValue();
 
-			// 사용되지 않은 아웃풋에 나의 것이 있는지
+			// 아웃풋에 사용되지 않은 나의 것이 있는지
 			if (mianUTXO.isMine(publicKey)) {
 
-				// 나의 지갑 사용하지 않은 아웃풋에 추가
+				// 있다면 나의 지갑 사용하지 않은 아웃풋에 추가
 				walletUTXOs.put(mianUTXO.id, mianUTXO);
 				total += mianUTXO.value;
 			}
@@ -73,24 +73,34 @@ public class Wallet {
 	}
 
 	public Transaction sendFunds(PublicKey _recipient, float value) {
+
+		// 기본금 확인 => 블록체인에 가지고있는 잔액을 개인 지갑으로 옮기는 과정
 		if (getBalance() < value) {
 			System.out.println("#Not Enough funds to send transaction. Transaction Discarded.");
+
 			return null;
 		}
-		ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
 
 		float total = 0;
+		ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
+
 		for (Map.Entry<String, TransactionOutput> item : walletUTXOs.entrySet()) {
-			TransactionOutput UTXO = item.getValue();
-			total += UTXO.value;
-			inputs.add(new TransactionInput(UTXO.id));
+			// 사용하지 않은 개인지갑 아웃풋을 확인
+			TransactionOutput walletUTXO = item.getValue();
+
+			total += walletUTXO.value;
+			inputs.add(new TransactionInput(walletUTXO.id));
+
 			if (total > value)
 				break;
 		}
 
 		Transaction newTransaction = new Transaction(publicKey, _recipient, value, inputs);
+
+		// 본인 지갑의 개인키로 서명을 만든다
 		newTransaction.generateSignature(privateKey);
 
+		// 사용하지 않은 아웃풋 리스트에서 사용한 아웃풋을 제거
 		for (TransactionInput input : inputs) {
 			walletUTXOs.remove(input.transactionOutputId);
 		}

@@ -20,14 +20,17 @@ public class BlockChainMain {
 
 	// 아직 사용하지 않은 아웃풋의 집합
 	public static HashMap<String, TransactionOutput> mainUTXOs = new HashMap<String, TransactionOutput>();
-
 	public static int difficulty = 3;
+
 	// 최소 금액
 	public static float minimumTransaction = 0.1f;
 
 	// 테스트 지갑
 	public static Wallet walletA;
 	public static Wallet walletB;
+	public static Wallet walletC;
+	public static Wallet walletD;
+	public static Wallet walletE;
 
 	// 최초의 트랜잭션
 	public static Transaction genesisTransaction;
@@ -39,6 +42,10 @@ public class BlockChainMain {
 		// 지갑들을 생성
 		walletA = new Wallet();
 		walletB = new Wallet();
+		walletC = new Wallet();
+		walletD = new Wallet();
+		walletE = new Wallet();
+
 		Wallet walletGnesis = new Wallet();
 
 		// 초기 거래를 생성하여, 샘플 코인 100을 A에게 보낸다.
@@ -65,25 +72,36 @@ public class BlockChainMain {
 		// start sample
 		Block block1 = startSampleA(genesis);
 
-		Block block2 = startSampleB(block1);
-
-		Block block3 = startSampleC(block2);
-
-		startSampleD(block3);
+		// Block block2 = startSampleB(block1);
+		//
+		// Block block3 = startSampleC(block2);
+		//
+		// startSampleD(block3);
 
 		System.out.println("\nBlockchain is valid : " + isChainValid());
 		System.out.println("\n================================= BLOCK CHAIN ================================= \n");
-		// System.out.println(StringUtil.getJson(blockchain));
+		System.out.println(StringUtil.getJson(blockchain));
 	}
 
 	private static Block startSampleA(Block genesis) {
 		Block block1 = new Block(genesis.hash);
 		System.out.println("\nWalletA's balance is: " + walletA.getBalance());
-		System.out.println("\nWalletA is Attempting to send funds (40) to WalletB...");
-		block1.addTransaction(walletA.sendFunds(walletB.publicKey, 40f));
+		System.out.println("\nWalletA is Attempting to send funds (30) to WalletB...");
+		System.out.println("\nWalletA is Attempting to send funds (20) to WalletC...");
+		System.out.println("\nWalletA is Attempting to send funds (10) to WalletD...");
+		System.out.println("\nWalletA is Attempting to send funds (5) to WalletE...");
+
+		block1.addTransaction(walletA.sendFunds(walletB.publicKey, 30f));
+		block1.addTransaction(walletA.sendFunds(walletC.publicKey, 20f));
+		block1.addTransaction(walletA.sendFunds(walletD.publicKey, 10f));
+		block1.addTransaction(walletA.sendFunds(walletE.publicKey, 5f));
 		addBlock(block1);
+
 		System.out.println("\nWalletA's balance is: " + walletA.getBalance());
 		System.out.println("WalletB's balance is: " + walletB.getBalance());
+		System.out.println("WalletC's balance is: " + walletC.getBalance());
+		System.out.println("WalletD's balance is: " + walletD.getBalance());
+		System.out.println("WalletE's balance is: " + walletE.getBalance());
 
 		return block1;
 	}
@@ -151,18 +169,20 @@ public class BlockChainMain {
 				return false;
 			}
 
+			// ------ transaction valid -------
+
 			TransactionOutput tempOutput;
 
-			for (int t = 0; t < currentBlock.transactions.size(); t++) {
-				Transaction currentTransaction = currentBlock.transactions.get(t);
+			for (int j = 0; j < currentBlock.transactions.size(); j++) {
+				Transaction currentTransaction = currentBlock.transactions.get(j);
 
 				if (!currentTransaction.verifySignature()) {
-					System.out.println("#Signature on Transaction(" + t + ") is Invalid");
+					System.out.println("#Signature on Transaction(" + j + ") is Invalid");
 					return false;
 				}
 
 				if (currentTransaction.getInputsValue() != currentTransaction.getOutputsValue()) {
-					System.out.println("#Inputs are note equal to outputs on Transaction(" + t + ")");
+					System.out.println("#Inputs are note equal to outputs on Transaction(" + j + ")");
 					return false;
 				}
 
@@ -170,35 +190,37 @@ public class BlockChainMain {
 					tempOutput = tempUTXOs.get(input.transactionOutputId);
 
 					if (tempOutput == null) {
-						System.out.println("#Referenced input on Transaction(" + t + ") is Missing");
+						System.out.println("#Referenced input on Transaction(" + j + ") is Missing");
 						return false;
 					}
 
 					if (input.UTXO.value != tempOutput.value) {
-						System.out.println("#Referenced input Transaction(" + t + ") value is Invalid");
+						System.out.println("#Referenced input Transaction(" + j + ") value is Invalid");
 						return false;
 					}
 
 					tempUTXOs.remove(input.transactionOutputId);
-				}
+
+				} // current transaction input List
 
 				for (TransactionOutput output : currentTransaction.outputs) {
 					tempUTXOs.put(output.id, output);
-				}
+
+				} // current transaction output List
 
 				if (currentTransaction.outputs.get(0).reciepient != currentTransaction.reciepient) {
-					System.out.println("#Transaction(" + t + ") output reciepient is not who it should be");
+					System.out.println("#Transaction(" + j + ") output reciepient is not who it should be");
 					return false;
 				}
 
 				if (currentTransaction.outputs.get(1).reciepient != currentTransaction.sender) {
-					System.out.println("#Transaction(" + t + ") output 'change' is not sender.");
+					System.out.println("#Transaction(" + j + ") output 'change' is not sender.");
 					return false;
 				}
 
-			}
+			} // current block transaction List
 
-		}
+		} // blockChain List
 
 		return true;
 	}

@@ -6,6 +6,31 @@ import java.util.Base64;
 import com.google.gson.GsonBuilder;
 import java.util.List;
 
+/**
+ * SHA-256
+ * 
+ * 어떤 입력 값에도 항상 고정된 길이의 해시 값을 출력한다.
+ * 
+ * 입력 값의 아주 일부만 변경되어도 전혀 다른 결과 값을 출력한다.(눈사태 효과)
+ * 
+ * 출력된 결과 값을 토대로 입력 값을 유추할 수 없다.
+ * 
+ * 입력 값은 항상 동일한 해시 값을 출력한다.
+ * 
+ * ---------------------------------
+ * 
+ * 타원곡선 암호법(ECDSA)
+ * 
+ * 타원곡선 이론에 기반한 공개 키 암호 방식이다.
+ * 
+ * -----------------------------------
+ * 
+ * base64
+ * 
+ * 64문자의 영숫자를 이용하여 멀티 바이트 문자열 또는 이진 데이터를 다루기 위한 인코딩 방식.
+ * 
+ * 
+ */
 public class StringUtil {
 
 	public static String applySha256(String input) {
@@ -32,10 +57,10 @@ public class StringUtil {
 		}
 	}
 
-	// 타원곡선 암호법
+	// 서명 생성 - 타원곡선 암호법
 	public static byte[] applyECDSASig(PrivateKey privateKey, String input) {
 		Signature dsa;
-		byte[] output = new byte[0];
+		byte[] signature = new byte[0];
 
 		try {
 			dsa = Signature.getInstance("ECDSA", "BC");
@@ -45,15 +70,16 @@ public class StringUtil {
 			dsa.update(strByte);
 
 			byte[] realSig = dsa.sign();
-			output = realSig;
+			signature = realSig;
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 
-		return output;
+		return signature;
 	}
 
+	// 서명 검증 - 타원곡선 암호법
 	public static boolean verifyECDSASig(PublicKey publicKey, String data, byte[] signature) {
 		try {
 			Signature ecdsaVerify = Signature.getInstance("ECDSA", "BC");
@@ -68,19 +94,12 @@ public class StringUtil {
 		}
 	}
 
-	public static String getJson(Object o) {
-		return new GsonBuilder().setPrettyPrinting().create().toJson(o);
-	}
-
-	// 마이닝 조건 레벨 => difficulty : 5 => "00000"
-	public static String getDificultyString(int difficulty) {
-		return new String(new char[difficulty]).replace('\0', '0');
-	}
-
+	// 키를 스트링으로 변환
 	public static String getStringFromKey(Key key) {
 		return Base64.getEncoder().encodeToString(key.getEncoded());
 	}
 
+	// 거래의 뿌리가 되는 Root, 이진트리
 	public static String getMerkleRoot(ArrayList<Transaction> transactions) {
 		int count = transactions.size();
 
@@ -106,5 +125,14 @@ public class StringUtil {
 		String merkleRoot = (treeLayer.size() == 1) ? treeLayer.get(0) : "";
 
 		return merkleRoot;
+	}
+
+	public static String getJson(Object o) {
+		return new GsonBuilder().setPrettyPrinting().create().toJson(o);
+	}
+
+	// 마이닝 조건 레벨 => difficulty : 5 => "00000"
+	public static String getDificultyString(int difficulty) {
+		return new String(new char[difficulty]).replace('\0', '0');
 	}
 }

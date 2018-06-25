@@ -20,7 +20,7 @@ public class Transaction {
 	// 수령자에게 보내는 금액
 	public float value;
 
-	// 이것은 누군가가 지갑에 돈을 쓰는 것을 막는 용도
+	// 누군가가 지갑에 돈을 쓰는 것을 막는 용도
 	public byte[] signature;
 
 	public ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
@@ -49,50 +49,41 @@ public class Transaction {
 			input.UTXO = BlockChainMain.mainUTXOs.get(input.transactionOutputId);
 		}
 
-		// 유효한 트랜잭션인지 확인
+		// 유효한 트랜잭션인지 확인 => 초기 최소값과 인풋 값을 비교
 		if (getInputsValue() < BlockChainMain.minimumTransaction) {
 			System.out.println("Transaction Inputs too small: " + getInputsValue());
 			System.out.println("Please enter the amount greater than " + BlockChainMain.minimumTransaction);
+
 			return false;
 		}
 
-		// 트랜잭션 출력 생성
-		float leftOver = getInputsValue() - value; // get value of inputs then the left over change:
+		// 트랜잭션 출력 생성준비 -> 지갑의 잔액에서 보낼 금액을 빼 남은 금액을 구한다.
+		float leftOver = getInputsValue() - value;
 
 		// 해쉬 생성
 		transactionId = calulateHash();
 
-		outputs.add(new TransactionOutput(this.reciepient, value, transactionId)); // send value to recipient
-		outputs.add(new TransactionOutput(this.sender, leftOver, transactionId)); // send the left over 'change' back to
-																					// sender
+		// 수령자에게 보낼 금액
+		// 보낸 사람이 보내고 남은 금액
+		outputs.add(new TransactionOutput(this.reciepient, value, transactionId));
+		outputs.add(new TransactionOutput(this.sender, leftOver, transactionId));
 
-		// Add outputs to Unspent list
-		for (TransactionOutput o : outputs) {
-			BlockChainMain.mainUTXOs.put(o.id, o);
+		// 메인 아웃풋 장부에 기록한다.
+		for (TransactionOutput output : outputs) {
+			BlockChainMain.mainUTXOs.put(output.id, output);
 		}
 
-		// Remove transaction inputs from UTXO lists as spent:
-		for (TransactionInput i : inputs) {
-			if (i.UTXO == null)
-				continue; // if Transaction can't be found skip it
-			BlockChainMain.mainUTXOs.remove(i.UTXO.id);
-		}
-
-		return true;
-	}
-
-	public float getInputsValue() {
-		float total = 0;
-
+		// 메인 아웃풋의 최초 트랜잭션을 찾아 제거해준다.
 		for (TransactionInput input : inputs) {
 
-			// 트랜잭션을 찾을 수 없는 경우 이 동작은 최적이 아닐 수 있다.
+			// 만약에 트랜잭션을 찾을 수 없을 경우 넘어간다.
 			if (input.UTXO == null)
 				continue;
 
-			total += input.UTXO.value;
+			BlockChainMain.mainUTXOs.remove(input.UTXO.id);
 		}
-		return total;
+
+		return true;
 	}
 
 	public void generateSignature(PrivateKey privateKey) {
@@ -109,11 +100,28 @@ public class Transaction {
 		return StringUtil.verifyECDSASig(sender, data, signature);
 	}
 
+	public float getInputsValue() {
+		float total = 0;
+
+		// 지갑 내의 인풋 트랜젹션의 금액을 전부 확인한다.
+		for (TransactionInput input : inputs) {
+			// 트랜잭션을 찾을 수 없는 경우 이 동작은 최적이 아닐 수 있음
+			if (input.UTXO == null)
+				continue;
+
+			total += input.UTXO.value;
+		}
+
+		return total;
+	}
+
 	public float getOutputsValue() {
 		float total = 0;
+
 		for (TransactionOutput o : outputs) {
 			total += o.value;
 		}
+
 		return total;
 	}
 

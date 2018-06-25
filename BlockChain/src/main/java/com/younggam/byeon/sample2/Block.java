@@ -52,7 +52,6 @@ public class Block {
 			return false;
 
 		if ((!"0".equals(previousHash))) {
-
 			if (!transaction.processTransaction()) {
 				System.out.println("Transaction failed to process.");
 				return false;
